@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Signal Trace</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header><img src="icon.png" alt=""><div><strong>Signal Trace</strong><small>LOCAL IOC LOOKUP</small></div></header>
+  <p class="intro">Checks use your local API and IOC dataset. No URL is sent to a remote service.</p>
+  <button id="check-page" class="primary">Check current page</button>
+  <div id="result" role="status" class="result">Ready when you are.</div>
+  <section><h2>Optional background checks</h2>
+    <p>Visit checks run after a page starts loading and can notify on exact local matches. They cannot block navigation.</p>
+    <button id="toggle-pages" class="secondary">Enable page checks</button>
+    <p>Download checks inspect the source URL only. File contents are not read.</p>
+    <button id="toggle-downloads" class="secondary">Enable download URL checks</button>
+  </section>
+  <script src="popup.js"></script>
+</body>
+</html>

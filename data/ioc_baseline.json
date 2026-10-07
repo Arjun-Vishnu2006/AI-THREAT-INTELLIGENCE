@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "dataset_id": "synthetic-ioc-baseline-v1",
+  "description": "Synthetic-only exact-match fixtures. These are not real threat indicators and must not be used as production intelligence.",
+  "records": [
+    {
+      "id": "syn-domain-001",
+      "type": "domain",
+      "value": "account-review.example.test",
+      "source": "synthetic-fixture",
+      "classification": "synthetic_known_malicious",
+      "tags": ["synthetic", "credential-lure-example"]
+    },
+    {
+      "id": "syn-ip-001",
+      "type": "ip",
+      "value": "192.0.2.66",
+      "source": "synthetic-fixture",
+      "classification": "synthetic_known_malicious",
+      "tags": ["synthetic", "documentation-address"]
+    },
+    {
+      "id": "syn-url-001",
+      "type": "url",
+      "value": "https://account-review.example.test/secure/verify",
+      "source": "synthetic-fixture",
+      "classification": "synthetic_known_malicious",
+      "tags": ["synthetic", "credential-lure-example"]
+    },
+    {
+      "id": "syn-hash-001",
+      "type": "file_hash_sha256",
+      "value": "0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f",
+      "source": "synthetic-fixture",
+      "classification": "synthetic_known_malicious",
+      "tags": ["synthetic", "placeholder-hash"]
+    }
+  ]
+}

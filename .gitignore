@@ -1,0 +1,41 @@
+.env
+.env.*
+!.env.example
+!.env.*.example
+.venv/
+.venv-*/
+__pycache__/
+*.py[cod]
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+*.log
+logs/
+.vscode/
+.idea/
+*.suo
+*.user
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Dataset source and redistribution rights have not been established.
+/data/train.csv
+/data/validation.csv
+/data/test.csv
+
+# This experiment metadata embeds local absolute Windows paths. Keep all
+# dataset-trained Android AE experiment outputs out of public commits until
+# data provenance and redistribution rights are verified.
+/models/android-novelty-autoencoder/
+
+# Temporary generated reports; the checked-in Phase 10 synthetic report is retained.
+/reports/tmp/
+/reports/*debug*
+/reports/*.tmp.*

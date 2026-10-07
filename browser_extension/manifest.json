@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Signal Trace Local Protection",
+  "version": "0.1.0",
+  "description": "Check pages and downloads against the locally configured IOC dataset.",
+  "permissions": ["activeTab", "contextMenus", "notifications"],
+  "optional_permissions": ["webNavigation", "downloads"],
+  "optional_host_permissions": ["http://*/*", "https://*/*"],
+  "host_permissions": ["http://127.0.0.1:8000/*", "http://localhost:8000/*"],
+  "background": { "service_worker": "service_worker.js" },
+  "action": {
+    "default_title": "Check this page with Signal Trace",
+    "default_popup": "popup.html"
+  },
+  "icons": { "128": "icon.png" }
+}
