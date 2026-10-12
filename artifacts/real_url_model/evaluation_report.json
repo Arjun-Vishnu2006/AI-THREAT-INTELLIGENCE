@@ -1,0 +1,87 @@
+{
+  "dataset": "data\\real_url_dataset\\data_bal - 20000.xlsx",
+  "dataset_age_note": "Source describes URLs collected in 2021",
+  "label_mapping": {
+    "0": "legitimate",
+    "1": "phishing"
+  },
+  "deduplicated_rows": 19997,
+  "split_sizes": {
+    "train": 11998,
+    "validation": 3999,
+    "test": 4000
+  },
+  "class_counts": {
+    "0": 10000,
+    "1": 9997
+  },
+  "validation_comparison": {
+    "logistic_regression": {
+      "validation_f1": 0.9599399098647972,
+      "validation_precision": 0.9609022556390977,
+      "validation_recall": 0.9589794897448725,
+      "training_seconds": 3.136
+    },
+    "random_forest": {
+      "validation_f1": 0.9524044389642417,
+      "validation_precision": 0.9392023346303502,
+      "validation_recall": 0.9659829914957478,
+      "training_seconds": 3.299
+    }
+  },
+  "selected_model": "logistic_regression",
+  "test_metrics": {
+    "accuracy": 0.9575,
+    "precision_phishing": 0.9538690476190477,
+    "recall_phishing": 0.9615,
+    "f1_phishing": 0.9576693227091634,
+    "false_positive_rate": 0.0465,
+    "confusion_matrix_labels": [
+      "legitimate",
+      "phishing"
+    ],
+    "confusion_matrix": [
+      [
+        1907,
+        93
+      ],
+      [
+        77,
+        1923
+      ]
+    ],
+    "classification_report": {
+      "legitimate": {
+        "precision": 0.9611895161290323,
+        "recall": 0.9535,
+        "f1-score": 0.9573293172690763,
+        "support": 2000.0
+      },
+      "phishing": {
+        "precision": 0.9538690476190477,
+        "recall": 0.9615,
+        "f1-score": 0.9576693227091634,
+        "support": 2000.0
+      },
+      "accuracy": 0.9575,
+      "macro avg": {
+        "precision": 0.95752928187404,
+        "recall": 0.9575,
+        "f1-score": 0.9574993199891199,
+        "support": 4000.0
+      },
+      "weighted avg": {
+        "precision": 0.95752928187404,
+        "recall": 0.9575,
+        "f1-score": 0.9574993199891199,
+        "support": 4000.0
+      }
+    }
+  },
+  "limitations": [
+    "Historical dataset collected in 2021",
+    "Random split does not establish performance on future URLs",
+    "Dataset may contain collection bias and duplicate domains",
+    "This model does not fetch URLs or verify live reputation"
+  ]
+}

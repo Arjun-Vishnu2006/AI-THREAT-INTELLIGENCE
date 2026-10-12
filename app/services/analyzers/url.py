@@ -1,8 +1,13 @@
+
 from __future__ import annotations
 
 import ipaddress
 import re
+from functools import lru_cache
+from pathlib import Path
 from urllib.parse import parse_qsl, unquote, urlsplit
+
+import joblib
 
 from app.services.analyzers.common import (
     artifact_id, domain_of, evidence, host_is_ip, indicator, normalize_url,
@@ -14,14 +19,33 @@ _SCHEME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*://")
 _HEX_ESCAPE_RE = re.compile(r"%[0-9a-fA-F]{2}")
 
 
+@lru_cache(maxsize=1)
+def _load_url_model():
+    """Load the locally trained URL classifier once."""
+    model_path = (
+        Path(__file__).resolve().parents[3]
+        / "artifacts"
+        / "real_url_model"
+        / "url_phishing_model.joblib"
+    )
+    if not model_path.is_file():
+        return None
+    return joblib.load(model_path)
+
+
 class URLAnalyzer:
     name = "url"
     supported_kinds = frozenset({"url"})
 
-    def analyze(self, artifact: dict, context: AnalysisContext | None = None) -> FeatureBundle:
-        raw = str(artifact.get("submitted_value") or artifact.get("url") or "").strip()
+    def analyze(
+        self, artifact: dict, context: AnalysisContext | None = None
+    ) -> FeatureBundle:
+        raw = str(
+            artifact.get("submitted_value") or artifact.get("url") or ""
+        ).strip()
         if not raw:
             raise ValueError("URL artifact has no submitted_value")
+
         candidate = raw if _SCHEME_RE.match(raw) else f"http://{raw}"
         try:
             parsed = urlsplit(candidate)
@@ -39,26 +63,38 @@ class URLAnalyzer:
         path_suffix = decoded_path.rsplit("/", 1)[-1].rsplit(".", 1)
         suffix = path_suffix[-1].casefold() if len(path_suffix) == 2 else ""
         is_ip = host_is_ip(host)
+
         try:
             ip_version = ipaddress.ip_address(host).version if is_ip else None
         except ValueError:
             ip_version = None
+
         features = {
             "url.length": len(raw),
             "url.scheme": parsed.scheme.casefold(),
             "url.has_explicit_scheme": bool(_SCHEME_RE.match(raw)),
-            "url.has_userinfo": parsed.username is not None or parsed.password is not None,
+            "url.has_userinfo": (
+                parsed.username is not None or parsed.password is not None
+            ),
             "url.host": host,
             "url.host_is_ip": is_ip,
             "url.ip_version": ip_version,
             "url.host_length": len(host or ""),
             "url.host_label_count": len(labels),
-            "url.longest_host_label": max((len(label) for label in labels), default=0),
-            "url.has_punycode_label": any(label.startswith("xn--") for label in labels),
-            "url.subdomain_label_count": max(0, len(labels) - 2) if not is_ip else 0,
+            "url.longest_host_label": max(
+                (len(label) for label in labels), default=0
+            ),
+            "url.has_punycode_label": any(
+                label.startswith("xn--") for label in labels
+            ),
+            "url.subdomain_label_count": (
+                max(0, len(labels) - 2) if not is_ip else 0
+            ),
             "url.port": port,
             "url.path_length": len(path),
-            "url.path_segment_count": len([p for p in path.split("/") if p]),
+            "url.path_segment_count": len(
+                [part for part in path.split("/") if part]
+            ),
             "url.path_extension": suffix,
             "url.query_length": len(parsed.query),
             "url.query_parameter_count": len(query_pairs),
@@ -69,23 +105,125 @@ class URLAnalyzer:
             "url.hyphen_count": raw.count("-"),
             "url.percent_escape_count": len(_HEX_ESCAPE_RE.findall(raw)),
             "url.contains_non_ascii": any(ord(ch) > 127 for ch in raw),
-            "url.redirect_parameter_names": [k for k, _ in query_pairs if k.casefold() in {"url", "redirect", "redirect_uri", "next", "continue", "return", "returnto", "target"}],
+            "url.redirect_parameter_names": [
+                key for key, _ in query_pairs
+                if key.casefold() in {
+                    "url", "redirect", "redirect_uri", "next",
+                    "continue", "return", "returnto", "target",
+                }
+            ],
             "url.network_requested": False,
         }
+
         indicators = []
         if host:
             kind = "ip" if is_ip else "domain"
             indicators.append(indicator(kind, host, normalized=host))
-        indicators.append(indicator("url", raw, normalized=normalized_url))
-        observations = [evidence(
-            "url_analysis",
-            "URL was structurally analyzed without making a network request.",
-            attributes={"normalized_url": normalized_url},
-        )]
+        indicators.append(
+            indicator("url", raw, normalized=normalized_url)
+        )
+
+        observations = [
+            evidence(
+                "url_analysis",
+                "URL was structurally analyzed without making a network request.",
+                attributes={"normalized_url": normalized_url},
+            )
+        ]
+
         if features["url.has_userinfo"]:
-            observations.append(evidence("url_structure", "URL contains user information before the host."))
+            observations.append(
+                evidence(
+                    "url_structure",
+                    "URL contains user information before the host.",
+                )
+            )
         if features["url.has_punycode_label"]:
-            observations.append(evidence("url_structure", "Host contains an IDNA punycode label."))
+            observations.append(
+                evidence(
+                    "url_structure",
+                    "Host contains an IDNA punycode label.",
+                )
+            )
         if features["url.redirect_parameter_names"]:
-            observations.append(evidence("url_structure", "Query contains a parameter commonly used to carry a destination URL.", attributes={"parameter_names": features["url.redirect_parameter_names"]}))
-        return FeatureBundle(self.name, "url", artifact_id(artifact), features, tuple(indicators), evidence=tuple(observations), limitations=("No DNS lookup, HTTP request, redirect following, or reputation lookup was performed.",))
+            observations.append(
+                evidence(
+                    "url_structure",
+                    "Query contains a parameter commonly used to carry a destination URL.",
+                    attributes={
+                        "parameter_names": features[
+                            "url.redirect_parameter_names"
+                        ]
+                    },
+                )
+            )
+
+        limitations = [
+            "No DNS lookup, HTTP request, redirect following, or reputation lookup was performed."
+        ]
+
+        # ML prediction: do not let model errors disable structural analysis.
+        try:
+            model = _load_url_model()
+
+            if model is None:
+                features["url.ml_status"] = "unavailable"
+                limitations.append("URL ML model file was not found.")
+            else:
+                prediction = int(model.predict([raw])[0])
+                probabilities = model.predict_proba([raw])[0]
+                classes = list(model.classes_)
+
+                if 1 not in classes:
+                    raise ValueError(
+                        "The loaded model has no phishing class (label 1)."
+                    )
+
+                phishing_probability = float(
+                    probabilities[classes.index(1)]
+                )
+                prediction_label = (
+                    "phishing" if prediction == 1 else "legitimate"
+                )
+
+                features["url.ml_status"] = "available"
+                features["url.ml_prediction"] = prediction_label
+                features["url.ml_phishing_probability"] = round(
+                    phishing_probability, 6
+                )
+
+                observations.append(
+                    evidence(
+                        "url_ml_prediction",
+                        (
+                            "The trained URL classifier flagged this URL as phishing."
+                            if prediction == 1
+                            else
+                            "The trained URL classifier classified this URL as legitimate."
+                        ),
+                        attributes={
+                            "prediction": prediction_label,
+                            "phishing_probability": round(
+                                phishing_probability, 6
+                            ),
+                            "model": "TF-IDF + Logistic Regression",
+                            "dataset": "historical 2021 URL dataset",
+                        },
+                    )
+                )
+
+        except Exception:
+            features["url.ml_status"] = "error"
+            limitations.append(
+                "URL ML prediction failed; structural analysis is still available."
+            )
+
+        return FeatureBundle(
+            self.name,
+            "url",
+            artifact_id(artifact),
+            features,
+            tuple(indicators),
+            evidence=tuple(observations),
+            limitations=tuple(limitations),
+        )

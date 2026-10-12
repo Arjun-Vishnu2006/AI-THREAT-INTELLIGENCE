@@ -8,6 +8,7 @@ from typing import Any
 from app.services.analyzers.common import (
     EMAIL_RE, URL_RE, artifact_id, evidence, indicator, normalize_url, safe_bytes, sha256,
 )
+from app.services.file_malware_ml import predict_pe_malware
 from app.services.contracts import AnalysisContext
 from app.services.feature_types import FeatureBundle
 from app.services.analyzers.android_apk import (
@@ -82,6 +83,39 @@ class FileAnalyzer:
         }
         observations = []
         is_apk = suffix == ".apk"
+
+        # EMBER ML assessment: Windows PE files only; never execute the file.
+        if detected_type == "pe":
+            ml_result = predict_pe_malware(data)
+            features["file.ml_status"] = ml_result.get("status")
+
+            if ml_result.get("status") == "available":
+                features["file.ml_prediction"] = ml_result["prediction"]
+                features["file.ml_malware_probability"] = ml_result[
+                    "malware_probability"
+                ]
+                observations.append(evidence(
+                    "file_ml_prediction",
+                    "EMBER 2018 static PE classifier produced a malware assessment.",
+                    attributes={
+                        "prediction": ml_result["prediction"],
+                        "malware_probability": ml_result["malware_probability"],
+                        "feature_dimensions": ml_result["feature_dimensions"],
+                        "model": ml_result["model"],
+                    },
+                ))
+            else:
+                features["file.ml_reason"] = ml_result.get("reason")
+                if ml_result.get("error"):
+                    features["file.ml_error"] = ml_result["error"]
+                observations.append(evidence(
+                    "file_ml_unavailable",
+                    "File-malware ML assessment could not be completed; existing static checks remain available.",
+                    attributes={
+                        "reason": ml_result.get("reason"),
+                        "error": ml_result.get("error"),
+                    },
+                ))
         if suffix in _SCRIPT_SUFFIXES or detected_type in {"pe", "elf", "ole"}:
             observations.append(evidence("file_type", "File is a script, executable, or OLE container by extension or signature.", attributes={"extension": suffix, "detected_type": detected_type}))
         if features["file.declared_mime_mismatch"]:

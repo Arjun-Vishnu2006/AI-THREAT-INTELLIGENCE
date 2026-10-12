@@ -1,0 +1,91 @@
+{
+  "task": "Spam versus ham email classification",
+  "positive_class": "spam",
+  "label_mapping": {
+    "0": "ham (legitimate according to source dataset)",
+    "1": "spam (according to source dataset)"
+  },
+  "dataset": {
+    "source": "SpamAssassin public corpus",
+    "input_directory": "data\\email_dataset\\extracted",
+    "usable_unique_samples": 2951,
+    "class_counts": {
+      "ham": 2473,
+      "spam": 478
+    }
+  },
+  "split": {
+    "method": "stratified train_test_split",
+    "test_size": 0.25,
+    "random_state": 42,
+    "training_samples": 2213,
+    "test_samples": 738
+  },
+  "model": {
+    "algorithm": "TF-IDF + Logistic Regression",
+    "tfidf_ngram_range": [
+      1,
+      2
+    ],
+    "tfidf_max_features": 100000,
+    "class_weight": "balanced"
+  },
+  "metrics": {
+    "accuracy": 0.989159891598916,
+    "spam_precision": 0.9912280701754386,
+    "spam_recall": 0.9416666666666667,
+    "spam_f1": 0.9658119658119658,
+    "false_positive_rate": 0.0016181229773462784,
+    "confusion_matrix_labels": [
+      "ham",
+      "spam"
+    ],
+    "confusion_matrix": [
+      [
+        617,
+        1
+      ],
+      [
+        7,
+        113
+      ]
+    ],
+    "classification_report": {
+      "ham": {
+        "precision": 0.9887820512820513,
+        "recall": 0.9983818770226537,
+        "f1-score": 0.9935587761674718,
+        "support": 618.0
+      },
+      "spam": {
+        "precision": 0.9912280701754386,
+        "recall": 0.9416666666666667,
+        "f1-score": 0.9658119658119658,
+        "support": 120.0
+      },
+      "accuracy": 0.989159891598916,
+      "macro avg": {
+        "precision": 0.990005060728745,
+        "recall": 0.9700242718446601,
+        "f1-score": 0.9796853709897189,
+        "support": 738.0
+      },
+      "weighted avg": {
+        "precision": 0.9891797779313826,
+        "recall": 0.989159891598916,
+        "f1-score": 0.9890470996869017,
+        "support": 738.0
+      }
+    }
+  },
+  "software": {
+    "scikit_learn": "1.9.1",
+    "pandas": "3.0.6"
+  },
+  "limitations": [
+    "Spam detection is not the same as phishing detection.",
+    "The corpus is historical and may not represent current email threats.",
+    "A random held-out split does not establish future or external generalization.",
+    "Predictions must be combined with other evidence and must not be treated as proof of safety."
+  ]
+}

@@ -14,8 +14,15 @@ dependencies = [
   "pydantic-settings>=2.5,<3.0",
   "networkx>=3.4,<4.0",
   "scikit-learn>=1.5,<2.0",
+  "numpy>=1.26,<3",
+  "joblib>=1.4,<2.0",
+  "lightgbm>=4.0,<5.0",
   "psycopg[binary]>=3.2,<4.0",
   "androguard>=4.1.4,<5.0",
+  "pandas>=2.2,<4.0",
+  "tqdm>=4.66,<5.0",
+  "lief==1.0.0",
+  "ember @ git+https://github.com/elastic/ember.git@d97a0b523de02f3fe5ea6089d080abacab6ee931",
 ]
 
 [project.optional-dependencies]

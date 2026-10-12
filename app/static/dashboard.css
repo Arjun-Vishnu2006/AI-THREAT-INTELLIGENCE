@@ -4,3 +4,258 @@
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 .alert-controls{display:flex;flex-wrap:wrap;gap:7px;padding-top:11px}.alert-controls .button{text-transform:capitalize}
 .camera-button{border:0;background:transparent;color:#9f94e7;padding:7px 0 0;font-size:9px;cursor:pointer}.camera-button:hover{color:#d0c8ff}.camera-tools{margin-top:9px}.camera-tools video{display:block;width:100%;max-height:220px;background:#080a0e;border-radius:5px;object-fit:cover;margin-bottom:8px}.camera-tools>div{display:flex;align-items:center;gap:10px}.integration-panel{margin-top:14px}.integration-note{font-size:10px;line-height:1.6;color:#8995a9;background:#111722;border:1px solid #293142;border-radius:6px;padding:11px 13px}.integration-note .note-bar{margin-right:8px}
+
+
+/* File Malware Assessment panel */
+#file-ml-card {
+  padding: 18px;
+  min-width: 0;
+}
+
+#file-ml-card .ml-result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+
+#file-ml-card .ml-result-item {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #111722;
+}
+
+#file-ml-card .ml-result-item span {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--muted);
+  font: 9px var(--mono);
+  letter-spacing: .5px;
+}
+
+#file-ml-card .ml-result-item strong {
+  display: block;
+  overflow-wrap: anywhere;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+#file-ml-card #file-ml-prediction.ml-phishing {
+  color: var(--red);
+}
+
+#file-ml-card #file-ml-prediction.ml-legitimate {
+  color: var(--cyan);
+}
+
+#file-ml-card .ml-score-track {
+  height: 7px;
+  margin: 12px 0;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #282e3c;
+}
+
+#file-ml-card .ml-score-fill {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  transition: width .25s ease;
+  background: var(--cyan);
+}
+
+#file-ml-card .ml-score-fill.danger {
+  background: var(--red);
+}
+
+#file-ml-card .ml-score-fill.safe {
+  background: var(--cyan);
+}
+
+#file-ml-card .ml-evidence {
+  margin: 12px 0;
+  color: #c4cbd8;
+  font-size: 11px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+#file-ml-card .ml-disclaimer {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--amber);
+  border-radius: 3px;
+  background: #191a20;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+@media (max-width: 760px) {
+  #file-ml-card .ml-result-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Shared ML assessment panel styling */
+.url-ml-card {
+  padding: 18px;
+  min-width: 0;
+}
+
+.ml-status {
+  display: inline-block;
+  max-width: 45%;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--muted);
+  font: 9px var(--mono);
+  overflow-wrap: anywhere;
+}
+
+.ml-result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.ml-result-item {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #111722;
+}
+
+.ml-result-item span {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--muted);
+  font: 9px var(--mono);
+}
+
+.ml-result-item strong {
+  display: block;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.ml-url {
+  word-break: break-word;
+}
+
+.ml-phishing {
+  color: var(--red) !important;
+}
+
+.ml-legitimate {
+  color: var(--cyan) !important;
+}
+
+.ml-score-track {
+  height: 7px;
+  margin: 12px 0;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #282e3c;
+}
+
+.ml-score-fill {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  transition: width .25s ease;
+  background: var(--cyan);
+}
+
+.ml-score-fill.danger {
+  background: var(--red);
+}
+
+.ml-score-fill.safe {
+  background: var(--cyan);
+}
+
+.ml-evidence {
+  margin: 12px 0;
+  color: #c4cbd8;
+  font-size: 11px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.ml-disclaimer {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--amber);
+  border-radius: 3px;
+  background: #191a20;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+@media (max-width: 760px) {
+  .ml-result-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ml-status {
+    max-width: 50%;
+    white-space: normal;
+  }
+}
+
+
+/* Responsive threat graph fixes */
+.graph-canvas {
+  width: 100%;
+  max-width: 100%;
+  overflow: auto;
+  min-width: 0;
+}
+
+.graph-canvas svg {
+  display: block;
+  width: 100%;
+  min-width: 680px;
+  height: auto;
+  overflow: visible;
+}
+
+.graph-canvas .graph-node text {
+  paint-order: stroke;
+  stroke: #111722;
+  stroke-width: 2px;
+  stroke-linejoin: round;
+}
+
+.graph-canvas .graph-node .node-type {
+  stroke-width: 1px;
+}
+
+.graph-canvas .edge-label-group rect {
+  fill: #111722;
+  stroke: #394156;
+  stroke-width: 0.8px;
+}
+
+.graph-canvas .edge-label {
+  font-size: 9px;
+  font-weight: 600;
+  dominant-baseline: middle;
+}
+
+@media (max-width: 760px) {
+  .graph-canvas svg {
+    min-width: 680px;
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "dataset": "EMBER 2018 labeled test_features.jsonl",
+  "model": "file_malware_model.joblib",
+  "evaluated_records": 200000,
+  "skipped_records": 0,
+  "accuracy": 0.926455,
+  "malware_precision": 0.9061669603314444,
+  "malware_recall": 0.95143,
+  "malware_f1": 0.928247030415376,
+  "false_positive_rate": 0.09852,
+  "confusion_matrix": {
+    "true_benign_predicted_benign": 90148,
+    "true_benign_predicted_malicious": 9852,
+    "true_malicious_predicted_benign": 4857,
+    "true_malicious_predicted_malicious": 95143
+  },
+  "classification_report": {
+    "benign": {
+      "precision": 0.9488763749276354,
+      "recall": 0.90148,
+      "f1-score": 0.9245711648419271,
+      "support": 100000.0
+    },
+    "malicious": {
+      "precision": 0.9061669603314444,
+      "recall": 0.95143,
+      "f1-score": 0.928247030415376,
+      "support": 100000.0
+    },
+    "accuracy": 0.926455,
+    "macro avg": {
+      "precision": 0.9275216676295399,
+      "recall": 0.926455,
+      "f1-score": 0.9264090976286516,
+      "support": 200000.0
+    },
+    "weighted avg": {
+      "precision": 0.92752166762954,
+      "recall": 0.926455,
+      "f1-score": 0.9264090976286516,
+      "support": 200000.0
+    }
+  },
+  "limitations": [
+    "Verify the provenance and separation of the test records from training data.",
+    "EMBER 2018 is historical and may not represent current malware.",
+    "Feature extraction uses the installed LIEF version, which differs from the original EMBER v2 environment."
+  ]
+}
